@@ -2,18 +2,9 @@ import time
 import requests
 import os
 
-FLIGHTS_API_GET_ENDPOINT = \
-    "https://api.sheety.co/29947824f08bf0ac81acc4a2e300d2f4/flightDealsSheet/prices"
-FLIGHTS_API_PUT_ENDPOINT_TEMPLATE = \
-    "https://api.sheety.co/29947824f08bf0ac81acc4a2e300d2f4/flightDealsSheet/prices/{row_id}"
+
 AMADEUS_GET_IATA_ENDPOINT = \
     "https://test.api.amadeus.com/v1/reference-data/locations"
-
-TOKEN = os.getenv("FLIGHT_DEALS_SHEET_API")
-
-HEADER = {
-    "Authorization": f"Bearer {TOKEN}"
-}
 
 class DataManager:
     def __init__(self, flights_api_get, flights_api_put, sheety_header):
