@@ -16,11 +16,13 @@ HEADER = {
 }
 
 class DataManager:
-    def __init__(self):
-        pass
+    def __init__(self, flights_api_get, flights_api_put, sheety_header):
+        self.flights_api_get = flights_api_get
+        self.flights_api_put = flights_api_put
+        self.sheety_header = sheety_header
 
     def retrieve_information(self):
-        response = requests.get(url=FLIGHTS_API_GET_ENDPOINT, headers=HEADER)
+        response = requests.get(url=self.flights_api_get, headers=self.sheety_header)
         if response.status_code == 200:
             return response.json()
         else:
@@ -53,7 +55,7 @@ class DataManager:
         for price in price_list:
             city = price["city"]
             row_id = price["id"]
-            time.sleep(1)  # Avoid hitting rate limits
+            time.sleep(1)  #Avoid hitting rate limit set by amadeus
 
             amadeus_input = {
                 "keyword": city,
@@ -64,25 +66,23 @@ class DataManager:
             if response.status_code == 200:
                 result = response.json()
                 if result["meta"]["count"] > 0:
-                    iata_code = result["data"][0]["iataCode"]
+                    city_code = result["data"][0]["address"]["cityCode"]
                     updated_data = {
                         "price": {
-                            "iataCode": iata_code  # ensure this matches your column name
+                            "iataCode": city_code
                         }
                     }
 
-                    put_url = FLIGHTS_API_PUT_ENDPOINT_TEMPLATE.format(row_id=row_id)
-                    put_response = requests.put(url=put_url, json=updated_data, headers=HEADER)
+                    put_url = self.flights_api_put.format(row_id=row_id)
+                    put_response = requests.put(url=put_url, json=updated_data, headers=self.sheety_header)
 
                     if put_response.status_code == 200:
-                        print(f"Updated {city} with IATA code {iata_code}")
+                        print(f"Updated {city} with city code {city_code}")
                     else:
                         print(f"PUT error {put_response.status_code}: {put_response.text}")
                 else:
-                    print(f"No IATA code found for {city}")
+                    print(f"No city code found for {city}")
             else:
                 print(f"Amadeus error for {city}: {response.status_code} {response.text}")
 
-# Run the process
-DataInstance = DataManager()
-DataInstance.add_iata()
+

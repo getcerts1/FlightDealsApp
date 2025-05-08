@@ -17,5 +17,15 @@ response = requests.get(url=AMADEUS_GET_IATA_ENDPOINT, params=amadeus_input, hea
 print(response.text)
 """
 
+amadeus_input = {
+    "keyword": "London",
+    "subType": "CITY"
+}
 
-print(DataInstance.access_token_generator())
+amadeus_token = DataInstance.access_token_generator()
+amadeus_header = {
+            "Authorization": f"Bearer {amadeus_token}"
+}
+
+response = requests.get(url=AMADEUS_GET_IATA_ENDPOINT, params=amadeus_input, headers=amadeus_header)
+print(response.text)
